@@ -1,0 +1,31 @@
+﻿body {
+    margin: 10px;
+    background: url('Content/cubes.png') fixed;
+}
+
+input {
+    margin: 5px;
+}
+
+#addBtn {
+    margin-top: 5px;
+    position: relative;
+    left: 6px;
+}
+
+#deleteBtn {
+    margin-left: 5px;
+}
+
+h5 {
+    line-height: 1px;
+}
+
+h1 {
+    line-height: 1px;
+    font-family: 'Oswald', sans-serif; 
+}
+
+.well {
+    background-color: rgba(192, 192, 192, .25);
+}
