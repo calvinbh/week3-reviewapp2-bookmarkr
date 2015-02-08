@@ -8,18 +8,13 @@ app.bookmark = function (name, url, category, count) {
     this.name = name;
     this.url = url;
     this.category = category;
-    this.count = function () {
-        for (var i in app.bookmarks) {
-            return i;
-        }
-    };
 };
 
 app.addBookmark = function () {
     var name = $('#inputName').val();
     var url = $('#inputUrl').val();
     var category = $('#inputCat').val();
-    var count = app.bookmark.count;
+
     var bookmark = new app.bookmark(name, url, category, count);
     app.bookmarks.push(bookmark);
     app.PostAJAX(app.postCallback, bookmark);
@@ -33,14 +28,14 @@ app.displayBookmarks = function () {
     elem.html('');
     for (var i = 0; i < app.bookmarks.length; i++) {
         bookmark = app.bookmarks[i];
-        elem.append('<div class="well well-sm" id="bookmarkWell"><h1>' + bookmark.name + '</h1><br /><h5><a href="' + bookmark.url + '">Visit Website</a></h5><br /><h5>' + bookmark.category + '</h5><button class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></button><button class="btn btn-danger" id="deleteBtn"><span class="glyphicon glyphicon-trash"></span></button></div>');
+        elem.append('<div class="well well-sm" id="bookmarkWell"><h1>' + bookmark.name + '</h1><br /><h5><a href="' + bookmark.url + '">Visit Website</a></h5><br /><h5>' + bookmark.category + '</h5><button class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></button><button class="btn btn-danger" id="deleteBtn" onclick="app.deleteBookmark(' + i + ');"><span class="glyphicon glyphicon-trash"></span></button></div>');
     }
 };
 
 app.updatePage = function (bookmark) {
     bookmark = app.bookmarks[app.bookmarks.length - 1];
     i = app.bookmarks.length - 1;
-    $('#showBookmarks').append('<div class="well well-sm"><h1>' + bookmark.name + '</h1><br /><h5><a href="' + bookmark.url + '">Visit Website</a></h5><br /><h5>' + bookmark.category + '</h5><button class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></button><button class="btn btn-danger" id="deleteBtn"><span class="glyphicon glyphicon-trash"></span></button></div>');
+    $('#showBookmarks').append('<div class="well well-sm"><h1>' + bookmark.name + '</h1><br /><h5><a href="' + bookmark.url + '">Visit Website</a></h5><br /><h5>' + bookmark.category + '</h5><button class="btn btn-warning"><span class="glyphicon glyphicon-pencil"></span></button><button class="btn btn-danger" id="deleteBtn" onclick="app.deleteBookmark(' + i + ');"><span class="glyphicon glyphicon-trash"></span></button></div>');
 };
 
 app.PostAJAX = function (callback, data) {
@@ -81,6 +76,34 @@ app.getCallback = function (request) {
     for (var prop in request) {
         request[prop].key = prop;
         app.bookmarks.push(request[prop]);
+    }
+    app.displayBookmarks();
+};
+
+app.deleteBookmark = function (index) {
+    var key = app.bookmarks[index].key;
+    app.DeleteAJAX(key, app.deleteCallback);
+};
+
+app.DeleteAJAX = function (key, callback) {
+    var request = new XMLHttpRequest();
+    request.open('DELETE', app.firebase + key + '/.json', true);
+    request.onload = function () {
+        if (this.status >= 200 && this.status < 400) {
+            callback(key);
+        } else {
+            console.log('There is an error in your DELETE');
+        }
+    };
+    request.send();
+};
+
+app.deleteCallback = function (key) {
+    for (var i = 0; i < app.bookmarks.length; i++) {
+        if (app.bookmarks[i].key === key) {
+            app.bookmarks.splice(i, 1);
+            break;
+        }
     }
     app.displayBookmarks();
 };
